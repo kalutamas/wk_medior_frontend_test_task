@@ -73,7 +73,7 @@ onBeforeUnmount(() => {
       <button class="btn btn-ghost btn-square lg:hidden" @click="emit('toggle-drawer')">
         <Bars3Icon class="h-8 w-8" />
       </button>
-      <h1 class="flex items-center gap-2 font-semibold"> <UserCircleIcon class="h-6 w-6" /> Ügyfél Admin</h1>
+      <h1 class="flex items-center gap-2 font-semibold whitespace-nowrap"> <UserCircleIcon class="h-6 w-6" /> Ügyfél Admin</h1>
     </div>
 
     <div class="navbar-center hidden md:flex">
