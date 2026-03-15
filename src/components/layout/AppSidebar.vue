@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { XMarkIcon, UserGroupIcon, MapIcon, MagnifyingGlassIcon } from '@heroicons/vue/24/outline'
+import { XMarkIcon, UserGroupIcon, MapIcon, MagnifyingGlassIcon, EnvelopeIcon } from '@heroicons/vue/24/outline'
 import { useRoute } from 'vue-router'
 
 const emit = defineEmits<{
@@ -11,7 +11,7 @@ const route = useRoute()
 </script>
 
 <template>
-  <aside class="min-h-full w-72 border-r border-base-300 bg-base-200">
+  <aside class="flex min-h-full w-72 flex-col border-r border-base-300 bg-base-200">
     <div class="border-b border-base-300 px-5 py-4 lg:hidden">
       <div class="flex items-center justify-between gap-2">
         <div>
@@ -38,7 +38,7 @@ const route = useRoute()
         >
       </label>
     </div>
-    <ul class="menu  pt-2 w-full text-base-content">
+    <ul class="menu w-full flex-1 pt-2 text-base-content">
       <li>
         <RouterLink
           to="/ugyfelek"
@@ -68,5 +68,9 @@ const route = useRoute()
         </RouterLink>
       </li>
     </ul>
+
+    <div class="border-t border-base-300 px-5 py-3 text-[11px] text-base-content/60 flex items-center justify-between gap-2">
+      &copy; Kalu Tamás <span>|</span> <a class="inline-flex gap-1 items-center" href="mailto:kalutamas@gmail.com"><EnvelopeIcon class="h-4 w-4" /> kalutamas@gmail.com</a>
+    </div>
   </aside>
 </template>

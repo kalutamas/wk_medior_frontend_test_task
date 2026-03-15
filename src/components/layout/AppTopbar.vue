@@ -8,6 +8,7 @@ import {
   UserCircleIcon,
 } from '@heroicons/vue/24/outline'
 import { onBeforeUnmount, onMounted, ref } from 'vue'
+import thomasAndersonImage from '@/assets/images/thomas_anderson.png'
 
 const emit = defineEmits<{
   (e: 'toggle-drawer'): void
@@ -15,7 +16,7 @@ const emit = defineEmits<{
 
 const userMenuRef = ref<HTMLDetailsElement | null>(null)
 const isDarkMode = ref(false)
-const themeStorageKey = 'wk_medior_frontend_test_task.theme'
+const themeStorageKey = 'vk-test-task.theme'
 const lightThemeName = ref('corporate')
 const darkThemeName = 'night'
 
@@ -77,7 +78,6 @@ onBeforeUnmount(() => {
         <MagnifyingGlassIcon class="h-5 w-5 text-base-content/60" />
         <input
           type="text"
-          name="search"
           placeholder="Keresés..."
           class="grow"
         >
@@ -89,7 +89,7 @@ onBeforeUnmount(() => {
         <summary class="btn btn-ghost">
             <div class="avatar avatar-online avatar-placeholder">
                 <div class="bg-neutral text-neutral-content w-8 rounded-full">
-                    <img src="https://picsum.photos/id/1074/100/100" />
+                  <img :src="thomasAndersonImage" alt="Thomas Anderson" />
                 </div>
             </div>
             <span class="hidden md:flex">Thomas Anderson</span>
