@@ -73,7 +73,7 @@ onBeforeUnmount(() => {
     </div>
 
     <div class="navbar-center hidden md:flex">
-      <label class="input input-bordered flex items-center gap-2 w-96 rounded-full">
+      <label class="input input-bordered flex items-center gap-2 w-82 rounded-full">
         <MagnifyingGlassIcon class="h-5 w-5 text-base-content/60" />
         <input
           type="text"
@@ -91,9 +91,9 @@ onBeforeUnmount(() => {
                     <img src="https://picsum.photos/id/1074/100/100" />
                 </div>
             </div>
-            Thomas Anderson
+            <span class="hidden md:flex">Thomas Anderson</span>
         </summary>
-        <ul class="menu dropdown-content z-20 mt-2 w-full rounded-box border border-base-300 bg-base-100 p-2 shadow">
+        <ul class="menu dropdown-content z-20 mt-2 w-full min-w-fit rounded-box border border-base-300 bg-base-100 p-2 shadow">
           <li>
             <a class="flex items-center gap-2">
               <UserCircleIcon class="h-4 w-4" />

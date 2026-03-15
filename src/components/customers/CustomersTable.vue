@@ -10,6 +10,8 @@ import {
 } from '@heroicons/vue/24/outline'
 import CustomerFormModal from '@/components/customers/CustomerFormModal.vue'
 import CustomerDeleteModal from '@/components/customers/CustomerDeleteModal.vue'
+import CustomerLocationModal from '@/components/customers/CustomerLocationModal.vue'
+import { useCustomerLocationActions } from '@/composables/useCustomerLocationActions'
 import { useCustomersTableQuerySync } from '@/composables/useCustomersTableQuerySync'
 import { useCustomersTableState } from '@/composables/useCustomersTableState'
 import { useCustomers } from '@/composables/useCustomers'
@@ -37,6 +39,12 @@ const isModalOpen = ref(false)
 const editingCustomer = ref<Customer | null>(null)
 const isDeleteModalOpen = ref(false)
 const deletingCustomer = ref<Customer | null>(null)
+const {
+  isLocationModalOpen,
+  locationCustomer,
+  openLocationModal,
+  saveCustomerLocation,
+} = useCustomerLocationActions(updateCustomer)
 const { isApplyingRouteState } = useCustomersTableQuerySync({
   rowsPerPageOptions,
   rowsPerPage,
@@ -157,7 +165,7 @@ const confirmDeleteCustomer = () => {
             </tr>
           </thead>
           <tbody>
-            <tr v-if="pagedCustomers.length === 0">
+            <tr v-if="pagedCustomers.length === 0" class="empty-row">
               <td colspan="6" class="py-8 text-center text-base-content/70">
                 Nincsenek ügyfelek.
               </td>
@@ -174,14 +182,14 @@ const confirmDeleteCustomer = () => {
               </td>
               <td data-label="Létrehozva">{{ formatDate(row.createdAt) }}</td>
               <td class="cell-actions actions-column" data-label="Műveletek">
-                <div class="flex gap-2">
+                <div class="flex gap-2 cell-actions-content">
                   <button class="btn btn-soft btn-primary btn-sm gap-1" @click="openEditModal(row)">
                     <PencilSquareIcon class="h-4 w-4" />
                     Szerkesztés
                   </button>
-                  <button class="btn btn-soft btn-secondary btn-sm gap-1">
+                  <button class="btn btn-soft btn-secondary btn-sm gap-1" @click="openLocationModal(row)">
                     <MapPinIcon class="h-4 w-4" />
-                    Lokáció
+                    Lokáció beállítása
                   </button>
                   <button class="btn btn-soft btn-error btn-sm gap-1" @click="openDeleteModal(row)">
                     <TrashIcon class="h-4 w-4" />
@@ -230,6 +238,12 @@ const confirmDeleteCustomer = () => {
     :customer-created-at="deletingCustomer?.createdAt ?? ''"
     @confirm="confirmDeleteCustomer"
   />
+
+  <CustomerLocationModal
+    v-model:open="isLocationModalOpen"
+    :customer="locationCustomer"
+    @save="saveCustomerLocation"
+  />
 </template>
 
 <style scoped>
@@ -253,7 +267,24 @@ const confirmDeleteCustomer = () => {
 
 @media (max-width: 767px) {
   .customers-table thead {
-    display: none;
+    display: block;
+  }
+
+  .customers-table thead tr {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.5rem;
+  }
+
+  .customers-table thead{
+    border-bottom: 1px solid #d1d1d1;
+    & th {
+      width: auto;
+      display: flex;
+      align-items: center;
+      border-bottom: 0;
+      padding: 0;
+    }
   }
 
   .customers-table,
@@ -268,7 +299,7 @@ const confirmDeleteCustomer = () => {
     margin-bottom: 0.75rem;
     border: 1px solid hsl(var(--bc) / 0.15);
     border-radius: 0.75rem;
-    padding: 0.75rem;
+    padding: 0;
     background: hsl(var(--b1));
   }
 
@@ -296,6 +327,11 @@ const confirmDeleteCustomer = () => {
     display: block;
     padding-top: 0.6rem;
     white-space: normal;
+    width: 100%;
+    & .cell-actions-content {
+      justify-content: center;
+      flex-wrap: wrap;
+    }
   }
 
   .customers-table td.cell-actions::before {

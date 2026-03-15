@@ -127,7 +127,6 @@ export const useCustomers = () => {
       ...payload,
       id: current.id,
       createdAt: current.createdAt,
-      location: payload.location ?? current.location,
     }
     saveToStorage()
   }

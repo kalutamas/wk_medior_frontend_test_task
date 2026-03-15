@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { XMarkIcon, UserGroupIcon, MapIcon } from '@heroicons/vue/24/outline'
+import { XMarkIcon, UserGroupIcon, MapIcon, MagnifyingGlassIcon } from '@heroicons/vue/24/outline'
 import { useRoute } from 'vue-router'
 
 const emit = defineEmits<{
@@ -27,6 +27,15 @@ const route = useRoute()
           <XMarkIcon class="h-8 w-8" />
         </button>
       </div>
+
+      <label class="input input-bordered mt-3 flex items-center gap-2 rounded-full md:hidden">
+        <MagnifyingGlassIcon class="h-5 w-5 text-base-content/60" />
+        <input
+          type="text"
+          placeholder="Keresés..."
+          class="grow"
+        >
+      </label>
     </div>
     <ul class="menu  pt-2 w-full text-base-content">
       <li>
