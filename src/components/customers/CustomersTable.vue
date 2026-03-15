@@ -1,46 +1,124 @@
 <script setup lang="ts">
+import { computed, ref, watch } from 'vue'
 import {
-  MapPinIcon,
   PencilSquareIcon,
   PlusIcon,
   TrashIcon,
+  MapPinIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
 } from '@heroicons/vue/24/outline'
+import CustomerFormModal from '@/components/customers/CustomerFormModal.vue'
+import CustomerDeleteModal from '@/components/customers/CustomerDeleteModal.vue'
+import { useCustomersTableQuerySync } from '@/composables/useCustomersTableQuerySync'
+import { useCustomersTableState } from '@/composables/useCustomersTableState'
+import { useCustomers } from '@/composables/useCustomers'
+import type { Customer, CustomerStatus, CustomerUpsertPayload } from '@/types/customer'
 
-const rows = [
-  {
-    id: '1',
-    name: 'Kovács Ádám',
-    email: 'adam@example.com',
-    status: 'Active',
-    tags: ['premium', 'b2b'],
-    createdAt: '2026-03-10',
-  },
-  {
-    id: '2',
-    name: 'Nagy Éva',
-    email: 'eva@example.com',
-    status: 'Inactive',
-    tags: ['trial'],
-    createdAt: '2026-03-08',
-  },
-  {
-    id: '3',
-    name: 'Szabó Péter',
-    email: 'peter@example.com',
-    status: 'Lead',
-    tags: ['inbound'],
-    createdAt: '2026-03-06',
-  },
-]
+const { customers, createCustomer, updateCustomer, removeCustomer } = useCustomers()
 
-const statusClass = (status: string) => {
-  if (status === 'Active') return 'badge badge-soft badge-outline badge-success'
-  if (status === 'Inactive') return 'badge badge-soft badge-outline badge-ghost'
-  if  (status === 'Lead') return 'badge badge-soft badge-outline badge-warning'
+const {
+  rowsPerPageOptions,
+  rowsPerPage,
+  currentPage,
+  sortField,
+  sortDirection,
+  shouldShowPaginationControls,
+  totalPages,
+  pageNumbers,
+  pagedCustomers,
+  toggleSort,
+  getSortIndicator,
+  goToPreviousPage,
+  goToNextPage,
+} = useCustomersTableState(customers)
+
+const isModalOpen = ref(false)
+const editingCustomer = ref<Customer | null>(null)
+const isDeleteModalOpen = ref(false)
+const deletingCustomer = ref<Customer | null>(null)
+const { isApplyingRouteState } = useCustomersTableQuerySync({
+  rowsPerPageOptions,
+  rowsPerPage,
+  currentPage,
+  sortField,
+  sortDirection,
+  totalPages,
+})
+
+watch(rowsPerPage, () => {
+  if (isApplyingRouteState.value) return
+  currentPage.value = 1
+})
+
+watch(isModalOpen, (open) => {
+  if (!open) {
+    editingCustomer.value = null
+  }
+})
+
+watch(isDeleteModalOpen, (open) => {
+  if (!open) {
+    deletingCustomer.value = null
+  }
+})
+
+const statusClass = (status: CustomerStatus) => {
+  if (status === 'active') return 'badge badge-soft badge-outline badge-success'
+  if (status === 'inactive') return 'badge badge-soft badge-outline badge-ghost'
+  if (status === 'lead') return 'badge badge-soft badge-outline badge-warning'
   return 'badge badge-soft badge-outline badge-info'
 }
+
+const statusLabel = (status: CustomerStatus) => {
+  if (status === 'active') return 'Aktív'
+  if (status === 'inactive') return 'Inaktív'
+  return 'Lead'
+}
+
+const formatDate = (iso: string) => {
+  const date = new Date(iso)
+  if (Number.isNaN(date.getTime())) return iso
+
+  return date.toLocaleDateString('hu-HU')
+}
+
+const openCreateModal = () => {
+  editingCustomer.value = null
+  isModalOpen.value = true
+}
+
+const openEditModal = (customer: Customer) => {
+  editingCustomer.value = customer
+  isModalOpen.value = true
+}
+
+const saveCustomer = (payload: CustomerUpsertPayload) => {
+  if (payload.id) {
+    updateCustomer(payload.id, payload)
+  } else {
+    createCustomer(payload)
+    currentPage.value = 1
+  }
+
+  isModalOpen.value = false
+  editingCustomer.value = null
+}
+
+const openDeleteModal = (customer: Customer) => {
+  deletingCustomer.value = customer
+  isDeleteModalOpen.value = true
+}
+
+const confirmDeleteCustomer = () => {
+  const customer = deletingCustomer.value
+  if (!customer) return
+
+  removeCustomer(customer.id)
+  isDeleteModalOpen.value = false
+  deletingCustomer.value = null
+}
+
 </script>
 
 <template>
@@ -49,7 +127,7 @@ const statusClass = (status: string) => {
       <div class="flex flex-wrap items-center justify-between gap-3">
         <h2 class="text-lg font-semibold">Ügyfelek</h2>
         <div class="flex items-center gap-2 whitespace-nowrap">
-          <button class="btn btn-primary btn-sm gap-1">
+          <button class="btn btn-primary btn-sm gap-1" @click="openCreateModal">
             <PlusIcon class="h-4 w-4" />
             Új ügyfél
           </button>
@@ -60,28 +138,44 @@ const statusClass = (status: string) => {
         <table class="table customers-table">
           <thead>
             <tr>
-              <th>Név</th>
+              <th>
+                <button class="sort-button" @click="toggleSort('name')">
+                  Név
+                  <span>{{ getSortIndicator('name') }}</span>
+                </button>
+              </th>
               <th>Email</th>
               <th>Státusz</th>
               <th>Címkék</th>
-              <th>Létrehozva</th>
+              <th>
+                <button class="sort-button" @click="toggleSort('createdAt')">
+                  Létrehozva
+                  <span>{{ getSortIndicator('createdAt') }}</span>
+                </button>
+              </th>
               <th class="actions-column">Műveletek</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="row in rows" :key="row.id">
+            <tr v-if="pagedCustomers.length === 0">
+              <td colspan="6" class="py-8 text-center text-base-content/70">
+                Nincsenek ügyfelek.
+              </td>
+            </tr>
+
+            <tr v-for="row in pagedCustomers" :key="row.id">
               <td class="font-medium" data-label="Név">{{ row.name }}</td>
               <td data-label="Email">{{ row.email }}</td>
-              <td data-label="Státusz"><span :class="statusClass(row.status)">{{ row.status }}</span></td>
+              <td data-label="Státusz"><span :class="statusClass(row.status)">{{ statusLabel(row.status) }}</span></td>
               <td data-label="Címkék">
                 <div class="flex flex-wrap gap-1">
                   <span v-for="tag in row.tags" :key="tag" class="badge badge-outline badge-secondary badge-sm">{{ tag }}</span>
                 </div>
               </td>
-              <td data-label="Létrehozva">{{ row.createdAt }}</td>
+              <td data-label="Létrehozva">{{ formatDate(row.createdAt) }}</td>
               <td class="cell-actions actions-column" data-label="Műveletek">
                 <div class="flex gap-2">
-                  <button class="btn btn-soft btn-primary btn-sm gap-1">
+                  <button class="btn btn-soft btn-primary btn-sm gap-1" @click="openEditModal(row)">
                     <PencilSquareIcon class="h-4 w-4" />
                     Szerkesztés
                   </button>
@@ -89,7 +183,7 @@ const statusClass = (status: string) => {
                     <MapPinIcon class="h-4 w-4" />
                     Lokáció
                   </button>
-                  <button class="btn btn-soft btn-error btn-sm gap-1">
+                  <button class="btn btn-soft btn-error btn-sm gap-1" @click="openDeleteModal(row)">
                     <TrashIcon class="h-4 w-4" />
                     Törlés
                   </button>
@@ -100,26 +194,57 @@ const statusClass = (status: string) => {
         </table>
       </div>
 
-      <div class="flex w-full flex-wrap items-center justify-between gap-3">
-        <select class="select select-bordered select-xs w-24 max-w-xs">
-          <option>10 / oldal</option>
-          <option>25 / oldal</option>
-          <option>50 / oldal</option>
+      <div v-if="shouldShowPaginationControls" class="flex w-full flex-wrap items-center justify-between gap-3">
+        <select name="userperpage" v-model.number="rowsPerPage" class="select select-bordered select-xs w-24 max-w-xs">
+          <option v-for="pageSize in rowsPerPageOptions" :key="pageSize" :value="pageSize">{{ pageSize }} / oldal</option>
         </select>
 
         <div class="join border border-base-200 rounded-box">
-          <button class="join-item btn btn-ghost btn-xs" aria-label="Előző oldal"><ChevronLeftIcon class="h-4 w-4" /></button>
-          <button class="join-item btn btn-ghost btn-xs btn-active">1</button>
-          <button class="join-item btn btn-ghost btn-xs">2</button>
-          <button class="join-item btn btn-ghost btn-xs">3</button>
-          <button class="join-item btn btn-ghost btn-xs" aria-label="Következő oldal"><ChevronRightIcon class="h-4 w-4" /></button>
+          <button class="join-item btn btn-ghost btn-xs" aria-label="Előző oldal" :disabled="currentPage === 1" @click="goToPreviousPage"><ChevronLeftIcon class="h-4 w-4" /></button>
+          <button
+            v-for="pageNumber in pageNumbers"
+            :key="pageNumber"
+            class="join-item btn btn-ghost btn-xs"
+            :class="{ 'btn-active': pageNumber === currentPage }"
+            @click="currentPage = pageNumber"
+          >
+            {{ pageNumber }}
+          </button>
+          <button class="join-item btn btn-ghost btn-xs" aria-label="Következő oldal" :disabled="currentPage === totalPages" @click="goToNextPage"><ChevronRightIcon class="h-4 w-4" /></button>
         </div>
       </div>
     </div>
   </section>
+
+  <CustomerFormModal
+    v-model:open="isModalOpen"
+    :customer="editingCustomer"
+    @save="saveCustomer"
+  />
+
+  <CustomerDeleteModal
+    v-model:open="isDeleteModalOpen"
+    :customer-name="deletingCustomer?.name ?? ''"
+    :customer-email="deletingCustomer?.email ?? ''"
+    :customer-status="deletingCustomer?.status ?? ''"
+    :customer-created-at="deletingCustomer?.createdAt ?? ''"
+    @confirm="confirmDeleteCustomer"
+  />
 </template>
 
 <style scoped>
+.customers-table .sort-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font: inherit;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
 .customers-table .actions-column {
   width: 1%;
   white-space: nowrap;

@@ -3,6 +3,19 @@ html, body, #app {
   font-family: "Inter", sans-serif;
 }
 
+/* Input */
+.input, select, textarea {
+  transition: border 300ms ease-in-out;
+  &:hover{
+    border-color: #858d96;
+  }
+  &:focus, &:focus-within {
+    outline: 0;
+  }
+  
+}
+
+
 /* Darkmode */
 html[data-theme="night"]{
   .border-base-300{
