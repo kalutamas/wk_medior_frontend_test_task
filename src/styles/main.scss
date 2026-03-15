@@ -1,0 +1,14 @@
+/* Fonts */
+html, body, #app {
+  font-family: "Inter", sans-serif;
+}
+
+/* Darkmode */
+html[data-theme="night"]{
+  .border-base-300{
+    border-color: #343a48; 
+  }
+  aside.bg-base-200{
+    background-color: transparent;
+  }
+}
