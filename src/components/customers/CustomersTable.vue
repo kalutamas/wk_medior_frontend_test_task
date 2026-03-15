@@ -25,7 +25,6 @@ const {
   currentPage,
   sortField,
   sortDirection,
-  shouldShowPaginationControls,
   totalPages,
   pageNumbers,
   pagedCustomers,
@@ -34,6 +33,8 @@ const {
   goToPreviousPage,
   goToNextPage,
 } = useCustomersTableState(customers)
+
+const isPaginationDisabled = computed(() => totalPages.value <= 1)
 
 const isModalOpen = ref(false)
 const editingCustomer = ref<Customer | null>(null)
@@ -202,23 +203,24 @@ const confirmDeleteCustomer = () => {
         </table>
       </div>
 
-      <div v-if="shouldShowPaginationControls" class="flex w-full flex-wrap items-center justify-between gap-3">
+      <div class="flex w-full flex-wrap items-center justify-between gap-3">
         <select name="userperpage" v-model.number="rowsPerPage" class="select select-bordered select-xs w-24 max-w-xs">
           <option v-for="pageSize in rowsPerPageOptions" :key="pageSize" :value="pageSize">{{ pageSize }} / oldal</option>
         </select>
 
         <div class="join border border-base-200 rounded-box">
-          <button class="join-item btn btn-ghost btn-xs" aria-label="Előző oldal" :disabled="currentPage === 1" @click="goToPreviousPage"><ChevronLeftIcon class="h-4 w-4" /></button>
+          <button class="join-item btn btn-ghost btn-xs" aria-label="Előző oldal" :disabled="isPaginationDisabled || currentPage === 1" @click="goToPreviousPage"><ChevronLeftIcon class="h-4 w-4" /></button>
           <button
             v-for="pageNumber in pageNumbers"
             :key="pageNumber"
             class="join-item btn btn-ghost btn-xs"
             :class="{ 'btn-active': pageNumber === currentPage }"
+            :disabled="isPaginationDisabled"
             @click="currentPage = pageNumber"
           >
             {{ pageNumber }}
           </button>
-          <button class="join-item btn btn-ghost btn-xs" aria-label="Következő oldal" :disabled="currentPage === totalPages" @click="goToNextPage"><ChevronRightIcon class="h-4 w-4" /></button>
+          <button class="join-item btn btn-ghost btn-xs" aria-label="Következő oldal" :disabled="isPaginationDisabled || currentPage === totalPages" @click="goToNextPage"><ChevronRightIcon class="h-4 w-4" /></button>
         </div>
       </div>
     </div>

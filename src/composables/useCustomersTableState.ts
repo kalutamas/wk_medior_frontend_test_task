@@ -12,7 +12,6 @@ export const useCustomersTableState = (customers: Ref<Customer[]>) => {
   const sortField = ref<SortField>('createdAt')
   const sortDirection = ref<SortDirection>('desc')
 
-  const shouldShowPaginationControls = computed(() => customers.value.length > 10)
   const totalPages = computed(() => Math.max(1, Math.ceil(customers.value.length / rowsPerPage.value)))
   const pageNumbers = computed(() => Array.from({ length: totalPages.value }, (_, index) => index + 1))
 
@@ -67,7 +66,6 @@ export const useCustomersTableState = (customers: Ref<Customer[]>) => {
     currentPage,
     sortField,
     sortDirection,
-    shouldShowPaginationControls,
     totalPages,
     pageNumbers,
     pagedCustomers,

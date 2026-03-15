@@ -186,10 +186,10 @@ onMounted(async () => {
 
         <div>
           <label class="label text-sm text-gray-600" for="customer-tags">
-            <span class="label-text">Tagek</span>
+            <span class="label-text">Címkék</span>
           </label>
           <input id="customer-tags" v-model="form.tagsInput" type="text" class="input input-bordered w-full" placeholder="premium, b2b">
-          <p class="mt-1 text-xs text-base-content/60">Vesszővel elválasztva add meg a tageket.</p>
+          <p class="mt-1 text-xs text-base-content/60">Vesszővel elválasztva add meg a címkéket.</p>
         </div>
 
         <div class="modal-action mt-6">

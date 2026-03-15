@@ -77,6 +77,7 @@ onBeforeUnmount(() => {
         <MagnifyingGlassIcon class="h-5 w-5 text-base-content/60" />
         <input
           type="text"
+          name="search"
           placeholder="Keresés..."
           class="grow"
         >
