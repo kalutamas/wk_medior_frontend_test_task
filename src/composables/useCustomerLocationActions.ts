@@ -13,11 +13,13 @@ export const useCustomerLocationActions = (updateCustomer: UpdateCustomer) => {
     }
   })
 
+  // Megnyitja a lokáció modált a kiválasztott ügyfélhez.
   const openLocationModal = (customer: Customer) => {
     locationCustomer.value = customer
     isLocationModalOpen.value = true
   }
 
+  // Menti a lokációt az aktív ügyfélen és zárja a modált.
   const saveCustomerLocation = (location: CustomerLocation | undefined) => {
     const customer = locationCustomer.value
     if (!customer) return

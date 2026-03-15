@@ -20,17 +20,20 @@ const themeStorageKey = 'vk-test-task.theme'
 const lightThemeName = ref('corporate')
 const darkThemeName = 'night'
 
+// Témát alkalmaz a dokumentumon és localStorage-ba menti.
 const applyTheme = () => {
   const theme = isDarkMode.value ? darkThemeName : lightThemeName.value
   document.documentElement.setAttribute('data-theme', theme)
   localStorage.setItem(themeStorageKey, theme)
 }
 
+// Sötét/világos mód között vált és alkalmazza az új témát.
 const toggleTheme = () => {
   isDarkMode.value = !isDarkMode.value
   applyTheme()
 }
 
+// Külső kattintásra bezárja a felhasználói menüt.
 const handleOutsideClick = (event: MouseEvent) => {
   const menu = userMenuRef.value
   const target = event.target as Node | null
@@ -43,7 +46,7 @@ const handleOutsideClick = (event: MouseEvent) => {
 }
 
 onMounted(() => {
-  // Use the theme defined in index.html as the light/default theme.
+  // Az index.html témáját veszi alapértelmezett világos témának.
   lightThemeName.value = document.documentElement.getAttribute('data-theme') || 'corporate'
 
   const savedTheme = localStorage.getItem(themeStorageKey)
@@ -78,6 +81,7 @@ onBeforeUnmount(() => {
         <MagnifyingGlassIcon class="h-5 w-5 text-base-content/60" />
         <input
           type="text"
+          name="search"
           placeholder="Keresés..."
           class="grow"
         >

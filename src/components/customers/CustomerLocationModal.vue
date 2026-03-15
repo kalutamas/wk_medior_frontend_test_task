@@ -24,6 +24,7 @@ const formErrors = ref({
   address: '',
 })
 
+// Törli az összes validációs hibaüzenetet.
 const resetErrors = () => {
   formErrors.value = {
     lat: '',
@@ -32,6 +33,7 @@ const resetErrors = () => {
   }
 }
 
+// Ügyfél koordinátáit tölti az űrlapba; lokáció hiányában törli a mezőket.
 const fillFromCustomer = (customer: Customer | null) => {
   if (!customer?.location) {
     form.value = {
@@ -51,10 +53,13 @@ const fillFromCustomer = (customer: Customer | null) => {
   resetErrors()
 }
 
+// Bezárja a natív <dialog> elemet.
 const close = () => {
   dialogRef.value?.close()
 }
 
+// Imperatív módon megjeleníti vagy elrejti a natív <dialog> elemet az open prop alapján.
+// Megvárja a következő DOM-ticketet, hogy az elem biztosan csatolva legyen.
 const syncDialogState = async (open: boolean) => {
   await nextTick()
 
@@ -69,6 +74,7 @@ const syncDialogState = async (open: boolean) => {
   if (dialog.open) dialog.close()
 }
 
+// Koordináta és cím mezőket validál; visszaadja az eredményt és a lokáció-objektumot.
 const validate = () => {
   const nextErrors = {
     lat: '',
@@ -123,6 +129,7 @@ const validate = () => {
   }
 }
 
+// Validál, sikeres esetén save eseményt küld és zárja a dialógust.
 const submit = () => {
   const result = validate()
   if (!result.isValid) return

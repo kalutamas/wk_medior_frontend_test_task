@@ -17,10 +17,13 @@ const emit = defineEmits<{
 
 const dialogRef = ref<HTMLDialogElement | null>(null)
 
+// Bezárja a natív <dialog> elemet.
 const close = () => {
   dialogRef.value?.close()
 }
 
+// Imperatív módon megjeleníti vagy elrejti a natív <dialog> elemet az open prop alapján.
+// Megvárja a következő DOM-ticket, hogy az elem biztosan csatolva legyen.
 const syncDialogState = async (open: boolean) => {
   await nextTick()
 
@@ -35,11 +38,13 @@ const syncDialogState = async (open: boolean) => {
   if (dialog.open) dialog.close()
 }
 
+// confirm eseményt küld a szülőnek és zárja a dialógust.
 const confirmDelete = () => {
   emit('confirm')
   close()
 }
 
+// A státuszkulcsot magyar feliratra fordítja.
 const statusLabel = (status: CustomerStatus | '') => {
   if (status === 'active') return 'Aktiv'
   if (status === 'inactive') return 'Inaktiv'
@@ -47,6 +52,7 @@ const statusLabel = (status: CustomerStatus | '') => {
   return '-'
 }
 
+// ISO dátumot magyar formátumra alakítja.
 const formatDate = (iso: string) => {
   const date = new Date(iso)
   if (Number.isNaN(date.getTime())) return '-'

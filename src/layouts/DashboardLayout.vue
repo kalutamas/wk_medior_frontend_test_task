@@ -6,10 +6,12 @@ import AppTopbar from '@/components/layout/AppTopbar.vue'
 
 const isDrawerOpen = ref(false)
 
+// Váltja a mobil oldalsáv (drawer) nyitott/zárt állapotát.
 const toggleDrawer = () => {
   isDrawerOpen.value = !isDrawerOpen.value
 }
 
+// Bezárja a mobil oldalsávot.
 const closeDrawer = () => {
   isDrawerOpen.value = false
 }

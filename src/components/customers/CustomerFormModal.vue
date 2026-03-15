@@ -24,6 +24,7 @@ const formErrors = ref({
   email: '',
 })
 
+// Az űrlap mezőit és hibáit alapértelmezettre állítja.
 const resetForm = () => {
   form.value = {
     name: '',
@@ -37,6 +38,7 @@ const resetForm = () => {
   }
 }
 
+// Szerkesztendő ügyfél adataival tölti fel az űrlapot.
 const fillFormFromCustomer = (customer: Customer) => {
   form.value = {
     name: customer.name,
@@ -50,6 +52,7 @@ const fillFormFromCustomer = (customer: Customer) => {
   }
 }
 
+// Vesszős címke stringet egyedi, tisztított tömbbé alakít.
 const parseTags = (rawTags: string) => {
   return Array.from(
     new Set(
@@ -61,6 +64,7 @@ const parseTags = (rawTags: string) => {
   )
 }
 
+// Kötelező mezőket ellenőrzi és beállítja a hibaüzeneteket.
 const validateForm = () => {
   const nextErrors = {
     name: '',
@@ -86,10 +90,13 @@ const validateForm = () => {
   return !nextErrors.name && !nextErrors.email
 }
 
+// Bezárja a natív <dialog> elemet.
 const close = () => {
   dialogRef.value?.close()
 }
 
+// Imperatív módon megjeleníti vagy elrejti a natív <dialog> elemet az open prop alapján.
+// Megvárja a következő DOM-ticketet, hogy az elem biztosan csatolva legyen.
 const syncDialogState = async (open: boolean) => {
   await nextTick()
 
@@ -108,6 +115,7 @@ const syncDialogState = async (open: boolean) => {
   }
 }
 
+// Validál, siker esetén save eseményt küld és zárja a dialógust.
 const submitForm = () => {
   if (!validateForm()) return
 

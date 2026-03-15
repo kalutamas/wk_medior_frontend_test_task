@@ -33,6 +33,7 @@ const defaultCustomers: Customer[] = [
 const customers = ref<Customer[]>([])
 let initialized = false
 
+// Érvénytelen státuszt 'lead'-re normalizálja.
 const normalizeStatus = (value: unknown): CustomerStatus => {
   if (value === 'active' || value === 'inactive' || value === 'lead') {
     return value
@@ -41,6 +42,7 @@ const normalizeStatus = (value: unknown): CustomerStatus => {
   return 'lead'
 }
 
+// Ellenőrzi, hogy az érték Customer típusú-e.
 const isCustomer = (value: unknown): value is Customer => {
   if (!value || typeof value !== 'object') return false
 
@@ -55,10 +57,12 @@ const isCustomer = (value: unknown): value is Customer => {
   )
 }
 
+// Ügyfeleket localStorage-ba menti.
 const saveToStorage = () => {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(customers.value))
 }
 
+// Ügyfeleket tölt localStorage-ból; hiba esetén alapértékekre vált.
 const loadFromStorage = () => {
   const raw = localStorage.getItem(STORAGE_KEY)
 
@@ -88,6 +92,7 @@ const loadFromStorage = () => {
   }
 }
 
+// Egyszeri inicializálást biztosít, SSR-t kizárja.
 const ensureInitialized = () => {
   if (initialized || typeof window === 'undefined') return
 
@@ -95,6 +100,7 @@ const ensureInitialized = () => {
   initialized = true
 }
 
+// Egyedi azonosítót generál (crypto.randomUUID vagy Date-alapú fallback).
 const generateId = () => {
   if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
     return crypto.randomUUID()
@@ -106,6 +112,7 @@ const generateId = () => {
 export const useCustomers = () => {
   ensureInitialized()
 
+  // Új ügyfelet szúr a lista elejére.
   const createCustomer = (payload: Omit<Customer, 'id' | 'createdAt'>) => {
     customers.value.unshift({
       ...payload,
@@ -115,6 +122,7 @@ export const useCustomers = () => {
     saveToStorage()
   }
 
+  // Meglévő ügyfél adatait frissíti; id és createdAt megmarad.
   const updateCustomer = (id: string, payload: Omit<Customer, 'id' | 'createdAt'>) => {
     const index = customers.value.findIndex((customer) => customer.id === id)
     if (index === -1) return
@@ -131,6 +139,7 @@ export const useCustomers = () => {
     saveToStorage()
   }
 
+  // Törli az adott ügyfelet és menti a listát.
   const removeCustomer = (id: string) => {
     customers.value = customers.value.filter((customer) => customer.id !== id)
     saveToStorage()

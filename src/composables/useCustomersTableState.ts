@@ -34,6 +34,7 @@ export const useCustomersTableState = (customers: Ref<Customer[]>) => {
     return sortedCustomers.value.slice(start, start + rowsPerPage.value)
   })
 
+  // Rendezési mező és irány váltása.
   const toggleSort = (field: SortField) => {
     if (sortField.value === field) {
       sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc'
@@ -45,16 +46,19 @@ export const useCustomersTableState = (customers: Ref<Customer[]>) => {
     currentPage.value = 1
   }
 
+  // Rendezési irányt jelző nyíl az adott oszlophoz.
   const getSortIndicator = (field: SortField) => {
     if (sortField.value !== field) return '↕'
     return sortDirection.value === 'asc' ? '↑' : '↓'
   }
 
+  // Előző oldalra lép, ha nem az elsőn van.
   const goToPreviousPage = () => {
     if (currentPage.value <= 1) return
     currentPage.value -= 1
   }
 
+  // Következő oldalra lép, ha nem az utolsón van.
   const goToNextPage = () => {
     if (currentPage.value >= totalPages.value) return
     currentPage.value += 1

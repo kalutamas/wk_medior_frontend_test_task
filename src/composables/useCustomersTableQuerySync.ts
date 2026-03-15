@@ -24,25 +24,30 @@ export const useCustomersTableQuerySync = ({
   const router = useRouter()
   const isApplyingRouteState = ref(false)
 
+  // perPage query param validálása; érvénytelen → 10.
   const normalizeRowsPerPage = (value: unknown) => {
     const parsed = Number(value)
     return rowsPerPageOptions.includes(parsed) ? parsed : 10
   }
 
+  // page query param validálása; érvénytelen → 1.
   const normalizeCurrentPage = (value: unknown) => {
     const parsed = Number(value)
     if (!Number.isInteger(parsed) || parsed < 1) return 1
     return parsed
   }
 
+  // sortBy query param validálása; érvénytelen → 'createdAt'.
   const normalizeSortField = (value: unknown): SortField => {
     return value === 'name' || value === 'createdAt' ? value : 'createdAt'
   }
 
+  // sortDir query param validálása; érvénytelen → 'desc'.
   const normalizeSortDirection = (value: unknown): SortDirection => {
     return value === 'asc' || value === 'desc' ? value : 'desc'
   }
 
+  // URL query paramétereket alkalmazza a táblázat állapotra; isApplyingRouteState jelzővel végtelen ciklust kerül el.
   const syncStateFromRoute = () => {
     isApplyingRouteState.value = true
 
@@ -58,6 +63,7 @@ export const useCustomersTableQuerySync = ({
     isApplyingRouteState.value = false
   }
 
+  // Táblázat állapotát URL query paraméterbe írja; változatlan vagy folyamatban lévő szinkron esetén kihagyja.
   const syncRouteFromState = async () => {
     if (isApplyingRouteState.value) return
 

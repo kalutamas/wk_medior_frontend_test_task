@@ -13,6 +13,7 @@ import { InformationCircleIcon } from '@heroicons/vue/24/outline'
 
 const { customers } = useCustomers()
 
+// Csak akkor ad vissza true-t, ha az ügyfélnek véges, érvényes lat/lng koordinátái vannak.
 const hasValidLocation = (
   customer: Customer,
 ): customer is Customer & { location: CustomerLocation } => {
@@ -56,6 +57,8 @@ const markerOptions = icon({
   shadowSize: [41, 41],
 })
 
+// Beállítja a térkép nézetét úgy, hogy az összes marker látható legyen.
+// Egyetlen markernél setView-t, több markernél fitBounds-t használ.
 const fitMapToMarkers = async () => {
   if (!mapRef.value || customersWithLocation.value.length === 0) {
     return
@@ -89,6 +92,7 @@ const fitMapToMarkers = async () => {
   )
 }
 
+// @ready eseményből megkapja a térkép példányt és elvégzi a kezdeti illesztést.
 const handleMapReady = async (map: LeafletMap) => {
   mapRef.value = map
   await fitMapToMarkers()

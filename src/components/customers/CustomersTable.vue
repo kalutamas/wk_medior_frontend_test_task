@@ -72,6 +72,7 @@ watch(isDeleteModalOpen, (open) => {
   }
 })
 
+// Státuszhoz tartozó badge CSS osztályok.
 const statusClass = (status: CustomerStatus) => {
   if (status === 'active') return 'badge badge-soft badge-outline badge-success'
   if (status === 'inactive') return 'badge badge-soft badge-outline badge-ghost'
@@ -79,12 +80,14 @@ const statusClass = (status: CustomerStatus) => {
   return 'badge badge-soft badge-outline badge-info'
 }
 
+// Státuszkulcsot magyar feliratra fordítja.
 const statusLabel = (status: CustomerStatus) => {
   if (status === 'active') return 'Aktív'
   if (status === 'inactive') return 'Inaktív'
   return 'Lead'
 }
 
+// ISO dátumstringet magyar lokalizációjú dátumszöveggé alakítja.
 const formatDate = (iso: string) => {
   const date = new Date(iso)
   if (Number.isNaN(date.getTime())) return iso
@@ -92,16 +95,19 @@ const formatDate = (iso: string) => {
   return date.toLocaleDateString('hu-HU')
 }
 
+// Létrehozó modált nyitja meg.
 const openCreateModal = () => {
   editingCustomer.value = null
   isModalOpen.value = true
 }
 
+// Szerkesztő modált nyitja meg a kiválasztott ügyfélhez.
 const openEditModal = (customer: Customer) => {
   editingCustomer.value = customer
   isModalOpen.value = true
 }
 
+// Ügyfelet ment (létrehozás vagy frissítés), majd zárja a modált.
 const saveCustomer = (payload: CustomerUpsertPayload) => {
   if (payload.id) {
     updateCustomer(payload.id, payload)
@@ -114,11 +120,13 @@ const saveCustomer = (payload: CustomerUpsertPayload) => {
   editingCustomer.value = null
 }
 
+// Törlés-megerősítő modált nyitja meg.
 const openDeleteModal = (customer: Customer) => {
   deletingCustomer.value = customer
   isDeleteModalOpen.value = true
 }
 
+// Törli az aktív ügyfelet és zárja a modált.
 const confirmDeleteCustomer = () => {
   const customer = deletingCustomer.value
   if (!customer) return
